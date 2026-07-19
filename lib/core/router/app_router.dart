@@ -36,7 +36,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuth = loc == '/login' || loc == '/register';
       if (!isLoggedIn && !isAuth) return '/login';
       if (isLoggedIn && isAuth) return user.isAdmin ? '/admin' : '/home';
-      // Admin should not be on user-only shell routes
       if (isLoggedIn && user.isAdmin && (loc == '/home' || loc == '/cart' || loc == '/products')) {
         return '/admin';
       }
@@ -44,16 +43,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     },
     refreshListenable: notifier,
     routes: [
-      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-      GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+      GoRoute(
+        path: '/login',
+        pageBuilder: (context, state) => const CustomTransitionPage(
+          child: LoginScreen(),
+          transitionsBuilder: _fadeTransition,
+        ),
+      ),
+      GoRoute(
+        path: '/register',
+        pageBuilder: (context, state) => const CustomTransitionPage(
+          child: RegisterScreen(),
+          transitionsBuilder: _fadeTransition,
+        ),
+      ),
       ShellRoute(
         builder: (_, __, child) => MainShell(child: child),
         routes: [
           GoRoute(path: '/home', builder: (_, __) => const HomeScreen()),
-          GoRoute(
-            path: '/products',
-            builder: (_, __) => const ProductListScreen(),
-          ),
+          GoRoute(path: '/products', builder: (_, __) => const ProductListScreen()),
           GoRoute(path: '/cart', builder: (_, __) => const CartScreen()),
           GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
           GoRoute(path: '/wishlist', builder: (_, __) => const WishlistScreen()),
@@ -61,8 +69,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/product/:id',
-        builder: (_, state) =>
-            ProductDetailScreen(productId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: ProductDetailScreen(productId: state.pathParameters['id']!),
+          transitionsBuilder: _slideUpTransition,
+        ),
       ),
       GoRoute(path: '/checkout', builder: (_, __) => const CheckoutScreen()),
       GoRoute(path: '/chat', builder: (_, __) => const ChatScreen()),
@@ -70,15 +81,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/orders', builder: (_, __) => const OrderHistoryScreen()),
       GoRoute(
         path: '/order/:id',
-        builder: (_, state) =>
-            OrderDetailScreen(orderId: state.pathParameters['id']!),
+        builder: (_, state) => OrderDetailScreen(orderId: state.pathParameters['id']!),
       ),
-      GoRoute(path: '/admin', builder: (_, __) => const AdminDashboardScreen(),
+      GoRoute(
+        path: '/admin',
+        builder: (_, __) => const AdminDashboardScreen(),
         routes: [
           GoRoute(
             path: 'product',
-            builder: (_, state) => AdminProductFormScreen(
-                productId: state.uri.queryParameters['id']),
+            builder: (_, state) => AdminProductFormScreen(productId: state.uri.queryParameters['id']),
           ),
           GoRoute(path: 'orders', builder: (_, __) => const AdminOrdersScreen()),
           GoRoute(path: 'categories', builder: (_, __) => const AdminCategoriesScreen()),
@@ -86,8 +97,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: 'revenue', builder: (_, __) => const AdminRevenueScreen()),
           GoRoute(
             path: 'users/:id',
-            builder: (_, state) =>
-                AdminUserDetailScreen(userId: state.pathParameters['id']!),
+            builder: (_, state) => AdminUserDetailScreen(userId: state.pathParameters['id']!),
           ),
         ],
       ),
@@ -98,16 +108,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-// Notifier lắng nghe currentUserProvider để refresh router
+Widget _fadeTransition(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+  return FadeTransition(opacity: animation, child: child);
+}
+
+Widget _slideUpTransition(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+  const begin = Offset(0.0, 0.1);
+  const end = Offset.zero;
+  const curve = Curves.easeOutCubic;
+  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+  return SlideTransition(position: animation.drive(tween), child: FadeTransition(opacity: animation, child: child));
+}
+
 class _RouterNotifier extends ChangeNotifier {
   _RouterNotifier(Ref ref) {
     ref.listen(currentUserProvider, (_, __) => notifyListeners());
-  }
-}
-
-// Simple listenable for GoRouter refresh (kept for compatibility)
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream stream) {
-    stream.listen((_) => notifyListeners());
   }
 }

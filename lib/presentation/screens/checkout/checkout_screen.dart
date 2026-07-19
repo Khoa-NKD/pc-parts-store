@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/services/auth_service.dart';
 import '../../../data/services/order_service.dart';
@@ -54,7 +56,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (mounted) context.go('/order/$orderId');
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red));
+          SnackBar(duration: const Duration(seconds: 1), content: Text('Lỗi: $e'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -104,7 +106,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             const Text('Tổng cộng', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Text(CurrencyFormatter.formatVND(total),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: DesignTokens.primary)),
           ]),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -134,13 +136,15 @@ class _PayOption extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: sel ? AppTheme.primary : Colors.transparent, width: 2),
+          side: BorderSide(color: sel ? DesignTokens.primary : Colors.transparent, width: 2),
         ),
         child: ListTile(
-          leading: Radio<String>(value: value, groupValue: selected, onChanged: (v) => onTap(v!), activeColor: AppTheme.primary),
+          leading: Radio<String>(value: value, groupValue: selected, onChanged: (v) => onTap(v!), activeColor: DesignTokens.primary),
           title: Row(children: [Icon(icon, size: 20), const SizedBox(width: 8), Expanded(child: Text(label))]),
         ),
       ),
     );
   }
 }
+
+

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/local/database_helper.dart';
 import '../../../data/models/user_model.dart';
@@ -80,7 +82,7 @@ class AdminUserDetailScreen extends ConsumerWidget {
               child: Column(children: [
                 CircleAvatar(
                   radius: 44,
-                  backgroundColor: user.isAdmin ? Colors.amber : AppTheme.primary,
+                  backgroundColor: user.isAdmin ? Colors.amber : DesignTokens.primary,
                   child: Text(user.name[0].toUpperCase(),
                       style: const TextStyle(
                           fontSize: 36, color: Colors.white, fontWeight: FontWeight.bold)),
@@ -211,7 +213,7 @@ class AdminUserDetailScreen extends ConsumerWidget {
       await ref.read(dbProvider).setUserLocked(u.id, locking);
       ref.invalidate(adminUsersProvider);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(duration: const Duration(seconds: 1), 
             content: Text(locking ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản')));
       }
     } else {
@@ -220,7 +222,7 @@ class AdminUserDetailScreen extends ConsumerWidget {
       ref.invalidate(adminUsersProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Đã cập nhật quyền')));
+            .showSnackBar(const SnackBar(duration: const Duration(seconds: 1), content: Text('Đã cập nhật quyền')));
       }
     }
   }
@@ -271,3 +273,5 @@ class _InfoRow extends StatelessWidget {
     ]);
   }
 }
+
+

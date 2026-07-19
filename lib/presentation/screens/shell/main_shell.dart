@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:lucide_icons/lucide_icons.dart';
+import '../../../core/theme/design_tokens.dart';
 import '../../providers/cart_provider.dart';
 
 class MainShell extends ConsumerWidget {
@@ -31,53 +33,79 @@ class MainShell extends ConsumerWidget {
         body: child,
         floatingActionButton: isChat
             ? null
-            : FloatingActionButton(
-                onPressed: () => context.push('/chat'),
-                backgroundColor: const Color(0xFF1A73E8),
-                shape: const CircleBorder(),
-                child: const Icon(Icons.chat_bubble_rounded, color: Colors.white),
+            : Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: DesignTokens.shadowMd,
+                  gradient: const LinearGradient(
+                    colors: [DesignTokens.primary, DesignTokens.secondary],
+                  ),
+                ),
+                child: FloatingActionButton(
+                  onPressed: () => context.push('/chat'),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  focusElevation: 0,
+                  highlightElevation: 0,
+                  hoverElevation: 0,
+                  shape: const CircleBorder(),
+                  child: const Icon(LucideIcons.messageSquare, color: Colors.white, size: 24),
+                ),
               ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: _idx(loc),
-          onDestinationSelected: (i) {
-            switch (i) {
-              case 0: context.go('/home');
-              case 1: context.go('/products');
-              case 2: context.go('/cart');
-              case 3: context.go('/profile');
-            }
-          },
-          destinations: [
-            const NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Trang chủ'),
-            const NavigationDestination(
-                icon: Icon(Icons.grid_view_outlined),
-                selectedIcon: Icon(Icons.grid_view),
-                label: 'Sản phẩm'),
-            NavigationDestination(
-              icon: badges.Badge(
-                showBadge: count > 0,
-                badgeStyle: const badges.BadgeStyle(badgeColor: Colors.red),
-                badgeContent: Text('$count',
-                    style: const TextStyle(color: Colors.white, fontSize: 10)),
-                child: const Icon(Icons.shopping_cart_outlined),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
               ),
-              selectedIcon: badges.Badge(
-                showBadge: count > 0,
-                badgeStyle: const badges.BadgeStyle(badgeColor: Colors.red),
-                badgeContent: Text('$count',
-                    style: const TextStyle(color: Colors.white, fontSize: 10)),
-                child: const Icon(Icons.shopping_cart),
+            ],
+          ),
+          child: NavigationBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            indicatorColor: DesignTokens.primary.withValues(alpha: 0.1),
+            selectedIndex: _idx(loc),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            onDestinationSelected: (i) {
+              switch (i) {
+                case 0: context.go('/home');
+                case 1: context.go('/products');
+                case 2: context.go('/cart');
+                case 3: context.go('/profile');
+              }
+            },
+            destinations: [
+              const NavigationDestination(
+                  icon: Icon(LucideIcons.home, size: 22),
+                  selectedIcon: Icon(LucideIcons.home, size: 22, color: DesignTokens.primary),
+                  label: 'Trang chủ'),
+              const NavigationDestination(
+                  icon: Icon(LucideIcons.grid, size: 22),
+                  selectedIcon: Icon(LucideIcons.grid, size: 22, color: DesignTokens.primary),
+                  label: 'Sản phẩm'),
+              NavigationDestination(
+                icon: badges.Badge(
+                  showBadge: count > 0,
+                  badgeStyle: const badges.BadgeStyle(badgeColor: DesignTokens.danger, padding: EdgeInsets.all(4)),
+                  badgeContent: Text('$count', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                  child: const Icon(LucideIcons.shoppingCart, size: 22),
+                ),
+                selectedIcon: badges.Badge(
+                  showBadge: count > 0,
+                  badgeStyle: const badges.BadgeStyle(badgeColor: DesignTokens.danger, padding: EdgeInsets.all(4)),
+                  badgeContent: Text('$count', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                  child: const Icon(LucideIcons.shoppingCart, size: 22, color: DesignTokens.primary),
+                ),
+                label: 'Giỏ hàng',
               ),
-              label: 'Giỏ hàng',
-            ),
-            const NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person),
-                label: 'Tài khoản'),
-          ],
+              const NavigationDestination(
+                  icon: Icon(LucideIcons.user, size: 22),
+                  selectedIcon: Icon(LucideIcons.user, size: 22, color: DesignTokens.primary),
+                  label: 'Tài khoản'),
+            ],
+          ),
         ),
       ),
     );

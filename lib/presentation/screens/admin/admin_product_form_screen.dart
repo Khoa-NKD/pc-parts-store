@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../data/models/product_model.dart';
 import '../../../data/services/product_service.dart';
 import '../../providers/product_provider.dart';
@@ -74,13 +76,13 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
       ref.invalidate(productsProvider);
       ref.invalidate(featuredProductsProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(duration: const Duration(seconds: 1), 
             content: Text(_editing != null ? 'Đã cập nhật' : 'Đã thêm sản phẩm')));
         context.pop();
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red));
+          SnackBar(duration: const Duration(seconds: 1), content: Text('Lỗi: $e'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -128,7 +130,7 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
             title: const Text('Sản phẩm nổi bật'),
             value: _isFeatured,
             onChanged: (v) => setState(() => _isFeatured = v),
-            activeThumbColor: AppTheme.primary,
+            activeThumbColor: DesignTokens.primary,
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -152,3 +154,5 @@ class _AdminProductFormScreenState extends ConsumerState<AdminProductFormScreen>
     );
   }
 }
+
+

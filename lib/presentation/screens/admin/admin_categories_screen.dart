@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../data/local/database_helper.dart';
 import '../../../data/models/category_model.dart';
 import '../../providers/category_provider.dart';
@@ -51,7 +53,7 @@ class AdminCategoriesScreen extends ConsumerWidget {
                       subtitle: Text('ID: ${cat.id}'),
                       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: AppTheme.primary),
+                          icon: const Icon(Icons.edit, color: DesignTokens.primary),
                           onPressed: () => _showForm(context, ref, cat),
                         ),
                         IconButton(
@@ -193,3 +195,5 @@ class _CategoryFormState extends State<_CategoryForm> {
     );
   }
 }
+
+
