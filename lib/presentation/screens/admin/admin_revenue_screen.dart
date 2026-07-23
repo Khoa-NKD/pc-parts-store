@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/local/database_helper.dart';
 
@@ -53,7 +55,7 @@ class _AdminRevenueScreenState extends ConsumerState<AdminRevenueScreen> {
                     title: 'Tổng doanh thu',
                     value: CurrencyFormatter.formatVND(stats['totalRevenue'] as double),
                     icon: Icons.attach_money,
-                    color: AppTheme.primary,
+                    color: DesignTokens.primary,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -196,7 +198,7 @@ class _CategoryRevenueCard extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600)),
                 Text(CurrencyFormatter.formatVND(e.value),
                     style: const TextStyle(
-                        color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                        color: DesignTokens.primary, fontWeight: FontWeight.bold)),
               ]),
               const SizedBox(height: 4),
               Row(children: [
@@ -208,7 +210,7 @@ class _CategoryRevenueCard extends StatelessWidget {
                       minHeight: 8,
                       backgroundColor: Colors.grey.shade200,
                       valueColor:
-                          const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                          const AlwaysStoppedAnimation<Color>(DesignTokens.primary),
                     ),
                   ),
                 ),
@@ -296,3 +298,5 @@ class _DailyRevenueCard extends StatelessWidget {
     );
   }
 }
+
+

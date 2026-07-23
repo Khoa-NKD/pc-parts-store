@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/services/order_service.dart';
 
@@ -66,7 +68,7 @@ class OrderDetailScreen extends ConsumerWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 const Text('Tổng cộng', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text(CurrencyFormatter.formatVND(order.totalAmount),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primary)),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: DesignTokens.primary)),
               ]),
             ])),
             const SizedBox(height: 24),
@@ -121,3 +123,5 @@ class OrderStatusBadge extends StatelessWidget {
     );
   }
 }
+
+

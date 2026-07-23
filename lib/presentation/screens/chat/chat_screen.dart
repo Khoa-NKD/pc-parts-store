@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../core/utils/currency_formatter.dart';
 import '../../../data/models/product_model.dart';
 import '../../../data/services/product_service.dart';
@@ -161,7 +163,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       appBar: AppBar(
         title: const Row(children: [
           CircleAvatar(
-            radius: 16, backgroundColor: AppTheme.primary,
+            radius: 16, backgroundColor: DesignTokens.primary,
             child: Icon(Icons.smart_toy, color: Colors.white, size: 18),
           ),
           SizedBox(width: 10),
@@ -194,7 +196,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 child: ActionChip(
                   label: Text(chip, style: const TextStyle(fontSize: 12)),
                   onPressed: () { _ctrl.text = chip; _send(); },
-                  backgroundColor: AppTheme.primary.withValues(alpha: 0.08),
+                  backgroundColor: DesignTokens.primary.withValues(alpha: 0.08),
                 ),
               ),
           ]),
@@ -225,7 +227,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               onTap: _send,
               child: Container(
                 width: 44, height: 44,
-                decoration: const BoxDecoration(color: AppTheme.primary, shape: BoxShape.circle),
+                decoration: const BoxDecoration(color: DesignTokens.primary, shape: BoxShape.circle),
                 child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
               ),
             ),
@@ -256,7 +258,7 @@ class _MessageBubble extends StatelessWidget {
             children: [
               if (!isUser) ...[
                 const CircleAvatar(
-                  radius: 14, backgroundColor: AppTheme.primary,
+                  radius: 14, backgroundColor: DesignTokens.primary,
                   child: Icon(Icons.smart_toy, color: Colors.white, size: 14),
                 ),
                 const SizedBox(width: 8),
@@ -265,7 +267,7 @@ class _MessageBubble extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isUser ? AppTheme.primary : Colors.white,
+                    color: isUser ? DesignTokens.primary : Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
@@ -345,7 +347,7 @@ class _ProductChip extends StatelessWidget {
                     CurrencyFormatter.formatVND(product.effectivePrice),
                     style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.bold,
-                      color: product.isOnSale ? Colors.red : AppTheme.primary,
+                      color: product.isOnSale ? Colors.red : DesignTokens.primary,
                     ),
                   ),
                 ]),
@@ -353,7 +355,7 @@ class _ProductChip extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppTheme.primary, borderRadius: BorderRadius.circular(8),
+                    color: DesignTokens.primary, borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text('Xem chi tiết',
                       textAlign: TextAlign.center,
@@ -394,7 +396,7 @@ class _TypingIndicatorState extends State<_TypingIndicator>
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(children: [
         const CircleAvatar(
-          radius: 14, backgroundColor: AppTheme.primary,
+          radius: 14, backgroundColor: DesignTokens.primary,
           child: Icon(Icons.smart_toy, color: Colors.white, size: 14),
         ),
         const SizedBox(width: 8),
@@ -422,3 +424,5 @@ class _TypingIndicatorState extends State<_TypingIndicator>
     );
   }
 }
+
+

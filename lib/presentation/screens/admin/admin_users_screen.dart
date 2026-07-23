@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../data/local/database_helper.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/services/auth_service.dart';
@@ -51,7 +53,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                   leading: CircleAvatar(
                     backgroundColor: u.isLocked
                         ? Colors.grey
-                        : (u.isAdmin ? Colors.amber : AppTheme.primary),
+                        : (u.isAdmin ? Colors.amber : DesignTokens.primary),
                     child: Text(u.name[0].toUpperCase(),
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
@@ -173,7 +175,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
       if (confirm != true) return;
       await ref.read(dbProvider).setUserLocked(u.id, locking);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(duration: const Duration(seconds: 1), 
             content: Text(locking ? 'Đã khóa tài khoản' : 'Đã mở khóa tài khoản')));
       }
     } else {
@@ -181,9 +183,11 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
       await ref.read(dbProvider).setUserRole(u.id, newRole);
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Đã cập nhật quyền')));
+            .showSnackBar(const SnackBar(duration: const Duration(seconds: 1), content: Text('Đã cập nhật quyền')));
       }
     }
     ref.invalidate(adminUsersProvider);
   }
 }
+
+

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/design_tokens.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_theme.dart';
+
 import '../../../data/local/database_helper.dart';
 import '../../../data/services/auth_service.dart';
 
@@ -49,7 +51,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         final ok = await db.checkPassword(user.email, _oldPassCtrl.text);
         if (!ok) {
           if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mật khẩu hiện tại không đúng'), backgroundColor: Colors.red),
+            const SnackBar(duration: const Duration(seconds: 1), content: Text('Mật khẩu hiện tại không đúng'), backgroundColor: Colors.red),
           );
           setState(() => _saving = false);
           return;
@@ -66,13 +68,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cập nhật thành công ✓'), backgroundColor: Colors.green),
+          const SnackBar(duration: const Duration(seconds: 1), content: Text('Cập nhật thành công ✓'), backgroundColor: Colors.green),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
+        SnackBar(duration: const Duration(seconds: 1), content: Text('Lỗi: $e'), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -93,7 +95,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             // Avatar
             Center(
               child: CircleAvatar(
-                radius: 48, backgroundColor: AppTheme.primary,
+                radius: 48, backgroundColor: DesignTokens.primary,
                 child: Text(user.name[0].toUpperCase(),
                     style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
@@ -178,3 +180,5 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     );
   }
 }
+
+

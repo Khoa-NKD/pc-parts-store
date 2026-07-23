@@ -81,7 +81,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen> {
                                   ref.invalidate(allOrdersProvider);
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Đã cập nhật: ${_label(status)}')));
+                                        SnackBar(duration: const Duration(seconds: 1), content: Text('Đã cập nhật: ${_label(status)}')));
                                   }
                                 },
                               )).toList(),

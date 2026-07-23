@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/theme/design_tokens.dart';
 import '../../../data/services/product_service.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/product_card.dart';
@@ -36,122 +38,132 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
     )));
 
     return Scaffold(
+      backgroundColor: DesignTokens.background,
       appBar: AppBar(
-        title: const Text('Sản phẩm'),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(44),
-          child: SizedBox(
-            height: 44,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        title: const Text('Tất cả sản phẩm'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchCtrl,
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm sản phẩm...',
+                prefixIcon: const Icon(LucideIcons.search, size: 20),
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(DesignTokens.borderRadiusM),
+                  borderSide: const BorderSide(color: DesignTokens.border),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                suffixIcon: _searchCtrl.text.isNotEmpty
+                    ? IconButton(icon: const Icon(LucideIcons.x, size: 18), onPressed: () => setState(() => _searchCtrl.clear()))
+                    : null,
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
               children: [
-                _CatChip(
+                _FilterChip(
                   label: 'Tất cả',
                   selected: selectedCat == null,
                   onTap: () => ref.read(selectedCategoryProvider.notifier).state = null,
                 ),
-                ...AppConstants.categories.map((c) => _CatChip(
+                ...AppConstants.categories.map((c) => _FilterChip(
                       label: c['name']!,
                       selected: selectedCat == c['id'],
-                      onTap: () =>
-                          ref.read(selectedCategoryProvider.notifier).state = c['id'],
+                      onTap: () => ref.read(selectedCategoryProvider.notifier).state = c['id'],
                     )),
               ],
             ),
           ),
-        ),
-      ),
-      body: Column(children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          child: TextField(
-            controller: _searchCtrl,
-            decoration: InputDecoration(
-              hintText: 'Tìm kiếm...',
-              prefixIcon: const Icon(Icons.search),
-              isDense: true,
-              suffixIcon: _searchCtrl.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () => setState(() => _searchCtrl.clear()))
-                  : null,
-            ),
-            onChanged: (_) => setState(() {}),
-          ),
-        ),
-        SizedBox(
-          height: 40,
-          child: ListView(
+          const SizedBox(height: 12),
+          SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            children: [
-              _SortChip(label: 'Mới nhất', value: 'newest', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
-              _SortChip(label: 'Giá tăng', value: 'price_asc', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
-              _SortChip(label: 'Giá giảm', value: 'price_desc', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
-              _SortChip(label: 'Đánh giá', value: 'rating', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
-            ],
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                _SortItem(label: 'Mới nhất', value: 'newest', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
+                _SortItem(label: 'Giá tăng', value: 'price_asc', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
+                _SortItem(label: 'Giá giảm', value: 'price_desc', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
+                _SortItem(label: 'Đánh giá', value: 'rating', selected: _sortBy, onTap: (v) => setState(() => _sortBy = v)),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: productsAsync.when(
-            loading: () => const LoadingShimmer(),
-            error: (e, _) => Center(child: Text('Lỗi: $e')),
-            data: (products) => products.isEmpty
-                ? const Center(child: Text('Không tìm thấy sản phẩm'))
-                : RefreshIndicator(
-                    onRefresh: () async => ref.invalidate(productsProvider(ProductFilter(
-                      category: selectedCat,
-                      searchQuery: _searchCtrl.text,
-                      sortBy: _sortBy,
-                    ))),
-                    child: GridView.builder(
-                      padding: const EdgeInsets.all(12),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.62,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
+          const SizedBox(height: 16),
+          Expanded(
+            child: productsAsync.when(
+              loading: () => const LoadingShimmer(),
+              error: (e, _) => Center(child: Text('Lỗi: $e')),
+              data: (products) => products.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.box, size: 64, color: DesignTokens.border),
+                          const SizedBox(height: 16),
+                          Text('Không tìm thấy sản phẩm', style: DesignTokens.bodyLarge),
+                        ],
                       ),
-                      itemCount: products.length,
-                      itemBuilder: (_, i) => ProductCard(product: products[i]),
+                    )
+                  : RefreshIndicator(
+                      onRefresh: () async => ref.invalidate(productsProvider(ProductFilter(
+                        category: selectedCat,
+                        searchQuery: _searchCtrl.text,
+                        sortBy: _sortBy,
+                      ))),
+                      child: GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.65,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        itemCount: products.length,
+                        itemBuilder: (_, i) => ProductCard(product: products[i]),
+                      ),
                     ),
-                  ),
+            ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }
 
-class _CatChip extends StatelessWidget {
+class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _CatChip({required this.label, required this.selected, required this.onTap});
+  const _FilterChip({required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(right: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? Theme.of(context).colorScheme.primary : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: selected
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey.shade300,
-          ),
+          color: selected ? DesignTokens.primary : Colors.white,
+          borderRadius: BorderRadius.circular(DesignTokens.borderRadiusM),
+          border: Border.all(color: selected ? DesignTokens.primary : DesignTokens.border),
+          boxShadow: selected ? DesignTokens.shadowSm : null,
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: selected ? Colors.white : Colors.black87,
-            fontSize: 12,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+          style: DesignTokens.bodySmall.copyWith(
+            color: selected ? Colors.white : DesignTokens.textPrimary,
+            fontWeight: selected ? FontWeight.bold : FontWeight.w500,
           ),
         ),
       ),
@@ -159,35 +171,39 @@ class _CatChip extends StatelessWidget {
   }
 }
 
-class _SortChip extends StatelessWidget {
+class _SortItem extends StatelessWidget {
   final String label, value, selected;
   final ValueChanged<String> onTap;
-  const _SortChip(
-      {required this.label,
-      required this.value,
-      required this.selected,
-      required this.onTap});
+  const _SortItem({required this.label, required this.value, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final sel = value == selected;
     return GestureDetector(
       onTap: () => onTap(value),
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: sel ? Theme.of(context).colorScheme.primary : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: sel
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey.shade300,
-          ),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: DesignTokens.bodySmall.copyWith(
+                color: sel ? DesignTokens.primary : DesignTokens.textSecondary,
+                fontWeight: sel ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(height: 4),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 2,
+              width: sel ? 20 : 0,
+              decoration: BoxDecoration(
+                color: DesignTokens.primary,
+                borderRadius: BorderRadius.circular(1),
+              ),
+            ),
+          ],
         ),
-        child: Text(label,
-            style: TextStyle(
-                color: sel ? Colors.white : Colors.black87, fontSize: 13)),
       ),
     );
   }
