@@ -9,6 +9,7 @@ import '../../../data/services/auth_service.dart';
 import '../../../data/services/order_service.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
+import 'payos_webview_screen.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
   const CheckoutScreen({super.key});
@@ -43,23 +44,75 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     setState(() => _loading = true);
     try {
       final cart = ref.read(cartProvider);
+      final total = ref.read(cartTotalProvider);
+      
       final orderId = await ref.read(orderServiceProvider).placeOrder(
         user: user, items: cart,
         shippingAddress: _addressCtrl.text.trim(),
         phone: _phoneCtrl.text.trim(),
         paymentMethod: _payment,
       );
-      await ref.read(cartProvider.notifier).clear();
-      // Invalidate products để cập nhật stock mới
-      ref.invalidate(productsProvider);
-      ref.invalidate(featuredProductsProvider);
-      if (mounted) context.go('/order/$orderId');
+
+      // Nếu chọn PayOS, thực hiện thêm bước thanh toán
+      if (_payment == 'payos') {
+        final int orderCode = _generateNumericOrderCode(orderId);
+        
+        final paymentUrl = await ref.read(orderServiceProvider).createPayOSPaymentLink(
+          orderId: orderId,
+          amount: total,
+          description: 'DH $orderCode', // Rút ngắn mô tả xuống dưới 25 ký tự
+        );
+
+        if (mounted) {
+          final int orderCode = _generateNumericOrderCode(orderId);
+          final result = await Navigator.push<String>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PayOSWebViewScreen(
+                url: paymentUrl,
+                orderCode: orderCode,
+              ),
+            ),
+          );
+
+          if (result == 'success') {
+            // Thanh toán thành công
+            await _finalizeOrder(orderId);
+          } else {
+            // Thanh toán bị hủy hoặc lỗi
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Thanh toán đã bị hủy')),
+              );
+            }
+          }
+        }
+      } else {
+        // Nếu là COD hoặc bank khác
+        await _finalizeOrder(orderId);
+      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(duration: const Duration(seconds: 1), content: Text('Lỗi: $e'), backgroundColor: Colors.red));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _finalizeOrder(String orderId) async {
+    // Cập nhật trạng thái đơn hàng trong Database sang 'PAID'
+    await ref.read(orderServiceProvider).updateOrderStatus(orderId, 'PAID');
+
+    await ref.read(cartProvider.notifier).clear();
+    ref.invalidate(productsProvider);
+    ref.invalidate(featuredProductsProvider);
+    if (mounted) context.go('/order/$orderId');
+  }
+
+  /// Helper để chuyển UUID String sang số nguyên cho PayOS (phải khớp với OrderService)
+  int _generateNumericOrderCode(String uuid) {
+    final String hex = uuid.replaceAll('-', '').substring(0, 8);
+    return int.parse(hex, radix: 16);
   }
 
   @override
@@ -90,6 +143,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           const Text('Phương thức thanh toán', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _PayOption(value: 'cod', label: 'Thanh toán khi nhận hàng (COD)', icon: Icons.money, selected: _payment, onTap: (v) => setState(() => _payment = v)),
+          _PayOption(value: 'payos', label: 'Thanh toán qua PayOS (VietQR)', icon: Icons.qr_code, selected: _payment, onTap: (v) => setState(() => _payment = v)),
           _PayOption(value: 'bank', label: 'Chuyển khoản ngân hàng', icon: Icons.account_balance, selected: _payment, onTap: (v) => setState(() => _payment = v)),
           _PayOption(value: 'momo', label: 'Ví MoMo', icon: Icons.wallet, selected: _payment, onTap: (v) => setState(() => _payment = v)),
           const SizedBox(height: 20),
